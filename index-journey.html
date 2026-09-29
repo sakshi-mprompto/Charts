@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>mPrompto — User Journey Flow (Recommendation Impact)</title>
+<style>
+:root{
+  --blue:#1769e0; --navy:#14243a; --sidebar:#30383d; --text:#182a42; --muted:#6c7b90;
+  --border:#e1e7ef; --bg:#f6f8fb; --green:#16a36a; --greenbg:#e8f6ee; --greenbd:#bfe6cf;
+  --bl:#1769e0; --blbg:#e9f1fd; --blbd:#c4dbf7; --amber:#f5a623; --red:#e9344f;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text)}
+.app{min-height:100vh;display:grid;grid-template-columns:218px 1fr;grid-template-rows:64px 1fr}
+.topbar{grid-column:1/-1;background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:18px;padding:0 22px}
+.hamburger{font-size:18px}.logo{font-size:20px;font-weight:800;letter-spacing:-.8px;color:var(--blue)}
+.client{border:1px solid var(--blue);border-radius:8px;padding:9px 12px;background:#fff;min-width:170px}
+.embark{margin-left:auto;font:20px Georgia,serif}
+.sidebar{background:var(--sidebar);color:#fff;padding:14px 9px}
+.section{font-size:11px;opacity:.55;text-transform:uppercase;letter-spacing:.08em;padding:8px 12px 5px}
+.nav{padding:10px 12px;border-radius:7px;font-size:13px;opacity:.9}
+.nav.active{background:#3a4348;box-shadow:inset 3px 0 0 #4e91ff;font-weight:600;opacity:1}
+main{padding:24px 30px}
+.head{text-align:center;margin-bottom:6px}
+h1{margin:0;font-size:26px;font-weight:800;letter-spacing:-.3px;color:#0f1729}
+.win{color:var(--muted);font-size:14px;margin-top:4px;font-weight:600}
+.card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:22px;margin-top:16px}
+.chart{width:100%;overflow-x:auto}.chart svg{display:block;max-width:100%;height:auto}
+/* takeaways */
+.takeaways{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:16px}
+.tk{border:1px solid var(--border);border-radius:11px;padding:14px 16px;background:#fbfcfe}
+.tk .ic{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;margin-bottom:8px;font-size:15px}
+.tk .t{font-size:13px;color:var(--text);line-height:1.45}
+.tk .t b{color:#0f1729}
+.note{font-size:11.5px;color:var(--muted);margin-top:14px}
+@media(max-width:1100px){.app{grid-template-columns:74px 1fr}.nav,.section{font-size:0;text-align:center}.nav:before{content:"\2022";font-size:18px}.takeaways{grid-template-columns:1fr 1fr}}
+@media(max-width:760px){.app{display:block}.sidebar{display:none}main{padding:16px}.embark{display:none}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="topbar">
+  <div class="hamburger">&#9776;</div>
+  <div class="logo"><span style="color:#e9344f">m</span>Prompto</div>
+  <select class="client"><option>Embark perfumes</option></select>
+  <div class="embark">EMBARK</div>
+</header>
+<aside class="sidebar">
+  <div class="section">Analytics</div>
+  <div class="nav">Live</div><div class="nav">Overview</div><div class="nav">Merchandising</div>
+  <div class="nav active">Journey</div><div class="nav">Intent</div><div class="nav">Impact</div>
+  <div class="section" style="margin-top:12px">Admin</div><div class="nav">Clients</div><div class="nav">Manage Catalog</div>
+</aside>
+<main>
+  <div class="head">
+    <h1>User Journey Flow (Waterfall) &ndash; Recommendation Impact</h1>
+    <div class="win" id="win">Reporting Window: —</div>
+  </div>
+  <div class="card"><div class="chart" id="flow"></div></div>
+  <div class="takeaways" id="takeaways"></div>
+  <div class="card" style="margin-top:16px"><div class="note" id="footnote"></div></div>
+</main>
+</div>
+<script>
+const D={
+  win:{start:"2026-08-14",end:"2026-08-20"},
+  total:{u:9715,p:100.0},
+  rec:{u:424,p:4.36},
+  nonrec:{u:9316,p:95.89},
+  recInteract:{u:236,p:55.66},        // % of rec journeys
+  recPdp:{u:424,p:100.0},             // % of rec journeys
+  recAtc:{u:171,p:40.33},             // % of rec journeys
+  recProdAtc:{u:80,p:46.78},          // % of rec ATC
+  diffProdAtc:{u:91,p:53.22},         // % of rec ATC
+  nonrecPdp:{u:3892,p:41.78},         // % of non-rec users
+  nonrecAtc:{u:1737,p:18.65}          // % of non-rec users
+};
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmt=n=>Number(n).toLocaleString("en-US");
+const dateLbl=s=>new Date(s+"T00:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});
+
+function flow(){
+  const el=document.getElementById("flow");
+  const W=1180,H=560;
+  const G="#16a36a",Gb="#e8f6ee",Gd="#bfe6cf",B="#1769e0",Bb="#e9f1fd",Bd="#c4dbf7",M="#0f1729";
+  // helpers
+  const box=(x,y,w,h,fill,stroke,r=12)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${r}" fill="${fill}" stroke="${stroke}" stroke-width="1.5"/>`;
+  const T=(x,y,t,o={})=>`<text x="${x}" y="${y}" text-anchor="${o.a||'middle'}" font-size="${o.s||12}" font-weight="${o.w||400}" fill="${o.f||'#334155'}"${o.ls?` letter-spacing="${o.ls}"`:''}>${t}</text>`;
+  const arrow=(x1,y1,x2,y2,col,label)=>{let g=`<defs></defs><line x1="${x1}" y1="${y1}" x2="${x2-8}" y2="${y2}" stroke="${col}" stroke-width="2"/><path d="M${x2-8},${y2-5} L${x2},${y2} L${x2-8},${y2+5} Z" fill="${col}"/>`;
+    if(label) g+=`<rect x="${((x1+x2)/2-26).toFixed(0)}" y="${(y1-24)}" width="52" height="17" rx="8" fill="#fff" stroke="${col}" stroke-opacity=".4"/>`+T((x1+x2)/2,y1-11,label,{s:10,w:700,f:col});return g;};
+
+  let s=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" font-family="Inter,Segoe UI,Arial">`;
+
+  // ---- stage headers ----
+  const stages=["1. Total Users","2. Recommendation Exposure","3. Recommended-product Interaction","4. Add to Cart (ATC)","5. ATC Product Breakdown"];
+  const sx=[70,250,470,690,910], sw=[150,190,190,190,230];
+  stages.forEach((t,i)=>{s+=box(sx[i],18,sw[i],38,"#f4f7fb","#e1e7ef",9);wrapT(sx[i]+sw[i]/2,i,t);});
+  function wrapT(cx,i,t){const parts=t.split(/(?<=\d\.)\s/);// keep number with text
+    // simple 2-line wrap
+    const words=t.split(" ");let l1=words.shift();let l2="";words.forEach(w=>{if((l1+" "+w).length<=22&&!l2)l1+=" "+w;else l2+=(l2?" ":"")+w;});
+    if(l2){s+=T(cx,34,esc(l1),{s:11,w:700,f:"#3a4a63"});s+=T(cx,48,esc(l2),{s:11,w:700,f:"#3a4a63"});}
+    else s+=T(cx,41,esc(t),{s:11,w:700,f:"#3a4a63"});}
+
+  // ---- total users anchor (dark) ----
+  const ax=70,ay=150,aw=110,ah=300;
+  s+=box(ax,ay,aw,ah,"#14243a","#14243a",14);
+  s+=T(ax+aw/2,ay+70,"&#128101;",{s:34,f:"#fff"});
+  s+=T(ax+aw/2,ay+150,fmt(D.total.u),{s:26,w:800,f:"#fff"});
+  s+=T(ax+aw/2,ay+172,"(100%)",{s:13,f:"#aebfd6"});
+  s+=T(ax+aw/2,ay+232,"Total",{s:12,f:"#c7d3e6"});
+  s+=T(ax+aw/2,ay+248,"Unique",{s:12,f:"#c7d3e6"});
+  s+=T(ax+aw/2,ay+264,"Users",{s:12,f:"#c7d3e6"});
+
+  // ================= GREEN LANE (top) =================
+  const gy=132, gh=150;
+  // node helper: returns center-right x for arrows
+  function node(x,w,y,h,big,sub,cap,fill,bd,capcol){
+    s+=box(x,y,w,h,fill,bd,12);
+    s+=T(x+w/2,y+40,big,{s:23,w:800,f:M});
+    if(sub)s+=T(x+w/2,y+58,sub,{s:12,w:700,f:capcol||"#3a7a55"});
+    let yy=y+84;(cap||[]).forEach(line=>{s+=T(x+w/2,yy,esc(line),{s:11,f:"#5b6a80"});yy+=14;});
+    return {r:x+w,cy:y+h/2,l:x};
+  }
+  // 2. received recommendation
+  const g2=node(250,170,gy,gh,fmt(D.rec.u),`(${D.rec.p}%)`,["Users who","received","recommendation"],Gb,Gd);
+  // 3. interaction
+  const g3=node(470,170,gy,gh,fmt(D.recInteract.u),`(${D.recInteract.p}%)`,["Recommended-product","interaction (click /","variant selection)"],Gb,Gd);
+  // 4. rec ATC
+  const g4=node(690,150,gy,gh,fmt(D.recAtc.u),`(${D.recAtc.p}%)`,["Recommended users","with ATC","(within window)"],Gb,Gd);
+  // 5. split panel (two stacked mini-boxes) inside an outer frame
+  const p5x=880,p5w=250,p5y=gy-6,p5h=gh+12;
+  s+=box(p5x,p5y,p5w,p5h,"#fdf7ee","#f0dcbd",14);
+  // recommended product
+  s+=box(p5x+12,p5y+12,p5w-24,(p5h-32)/2,"#eef8f1","#cfe9d8",10);
+  s+=`<circle cx="${p5x+40}" cy="${p5y+12+(p5h-32)/4}" r="16" fill="#16a36a"/>`+T(p5x+40,p5y+12+(p5h-32)/4+5,"&#9733;",{s:16,f:"#fff"});
+  s+=T(p5x+150,p5y+30,fmt(D.recProdAtc.u),{s:18,w:800,f:M});
+  s+=T(p5x+150,p5y+46,`(${D.recProdAtc.p}%) Added Recommended`,{s:10,f:"#3a7a55"});
+  // different product
+  const dy=p5y+12+(p5h-32)/2+8;
+  s+=box(p5x+12,dy,p5w-24,(p5h-32)/2,"#fdf4e3","#f0dcbd",10);
+  s+=`<circle cx="${p5x+40}" cy="${dy+(p5h-32)/4}" r="16" fill="#f5a623"/>`+T(p5x+40,dy+(p5h-32)/4+5,"&#128722;",{s:14,f:"#fff"});
+  s+=T(p5x+150,dy+18,fmt(D.diffProdAtc.u),{s:18,w:800,f:M});
+  s+=T(p5x+150,dy+34,`(${D.diffProdAtc.p}%) Added Different`,{s:10,f:"#a9781f"});
+
+  // green arrows
+  s+=arrow(g2.r,g2.cy,470,g3.cy,G,`${D.recInteract.p}%`);
+  s+=arrow(g3.r,g3.cy,690,g4.cy,G,`${D.recAtc.p}%`);
+  s+=arrow(g4.r,g4.cy,p5x,(p5y+p5h/2),G);
+  s+=T((g4.r+p5x)/2,g4.cy-14,`Base: ${fmt(D.recAtc.u)}`,{s:9.5,f:"#3a7a55",w:700});
+
+  // ================= BLUE LANE (bottom) =================
+  const by=330, bh=140;
+  const b2=node(250,170,by,bh,fmt(D.nonrec.u),`(${D.nonrec.p}%)`,["Users who did NOT","receive","recommendation"],Bb,Bd,"#245b9c");
+  const b3=node(470,170,by,bh,fmt(D.nonrecPdp.u),`(${D.nonrecPdp.p}%)`,["Non-recommended users","visiting any","Product Page"],Bb,Bd,"#245b9c");
+  const b4=node(690,150,by,bh,fmt(D.nonrecAtc.u),`(${D.nonrecAtc.p}%)`,["Non-recommended users","with ATC","(within period)"],Bb,Bd,"#245b9c");
+  // blue summary
+  const bs=node(880,250,by,bh,fmt(D.nonrecAtc.u),`(${D.nonrecAtc.p}% of Non-rec Users)`,["Non-recommended users","with ATC (within period)"],"#eef4fc","#c4dbf7","#245b9c");
+
+  // anchor splits into two lanes
+  s+=arrow(ax+aw,ay+ah*0.30,250,g2.cy,G);
+  s+=arrow(ax+aw,ay+ah*0.72,250,b2.cy,B);
+  // blue arrows
+  s+=arrow(b2.r,b2.cy,470,b3.cy,B,`${D.nonrecPdp.p}%`);
+  s+=arrow(b3.r,b3.cy,690,b4.cy,B,`${D.nonrecAtc.p}%`);
+  s+=arrow(b4.r,b4.cy,880,bs.cy,B);
+
+  s+=`</svg>`;el.innerHTML=s;
+  document.getElementById("win").textContent=`Reporting Window: ${dateLbl(D.win.start)} – ${dateLbl(D.win.end)}  (7 Days)`;
+}
+
+function takeaways(){
+  const lift=(D.recAtc.p/D.nonrecAtc.p).toFixed(1);
+  const items=[
+    {ic:"&#128101;",bg:"#e9f1fd",fg:"#1769e0",t:`Only <b>${D.rec.p}%</b> of users received a recommendation (<b>${fmt(D.rec.u)}</b> of ${fmt(D.total.u)}).`},
+    {ic:"&#128073;",bg:"#e8f6ee",fg:"#16a36a",t:`<b>${D.recInteract.p}%</b> of recommended users interacted with the recommended product (<b>${fmt(D.recInteract.u)}</b>).`},
+    {ic:"&#128722;",bg:"#e8f6ee",fg:"#16a36a",t:`Recommended users convert at <b>${D.recAtc.p}%</b> vs <b>${D.nonrecAtc.p}%</b> for non-recommended — a <b>${lift}×</b> lift.`},
+    {ic:"&#9733;",bg:"#fdf7ee",fg:"#f5a623",t:`Among recommended ATC users: <b>${D.recProdAtc.p}%</b> bought the recommended product, <b>${D.diffProdAtc.p}%</b> a different one.`}
+  ];
+  document.getElementById("takeaways").innerHTML=items.map(x=>`<div class="tk"><div class="ic" style="background:${x.bg};color:${x.fg}">${x.ic}</div><div class="t">${x.t}</div></div>`).join("");
+}
+
+function footnote(){
+  document.getElementById("footnote").innerHTML=
+   `<b>How to read:</b> The green lane follows users who received a recommendation; the blue lane follows those who did not. `+
+   `Percentages: exposure &amp; non-recommendation are of <b>total users (${fmt(D.total.u)})</b>; green-lane steps are of <b>recommended journeys (${fmt(D.rec.u)})</b>; `+
+   `the ${D.recProdAtc.p}% / ${D.diffProdAtc.p}% split is of <b>recommended ATC users (${fmt(D.recAtc.u)})</b>; blue-lane steps are of <b>non-recommended users (${fmt(D.nonrec.u)})</b>. `+
+   `Recommended lane is counted at journey grain, so lanes need not sum to total.`;
+}
+
+flow();takeaways();footnote();
+</script>
+</body>
+</html>
