@@ -1,0 +1,7 @@
+# Raw source data (already baked into the HTML dashboards; keep out of the public site)
+*.csv
+*.xlsx
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db

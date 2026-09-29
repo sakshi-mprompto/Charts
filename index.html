@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>mPrompto — Merchandising Dashboard</title>
+<style>
+:root{
+  --blue:#1769e0; --red:#e9344f; --navy:#14243a; --sidebar:#30383d;
+  --text:#182a42; --muted:#6c7b90; --border:#e1e7ef; --grid:#edf1f6; --bg:#f6f8fb;
+  --amber:#f5a623; --green:#16a36a;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text)}
+.app{min-height:100vh;display:grid;grid-template-columns:218px 1fr;grid-template-rows:64px 1fr}
+.topbar{grid-column:1/-1;background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:18px;padding:0 22px}
+.hamburger{font-size:18px}
+.logo{font-size:20px;font-weight:800;letter-spacing:-.8px;color:var(--blue)}
+.client{border:1px solid var(--blue);border-radius:8px;padding:9px 12px;background:#fff;color:var(--text);min-width:170px}
+.embark{margin-left:auto;font:20px Georgia,serif}
+.sidebar{background:var(--sidebar);color:#fff;padding:14px 9px}
+.section{font-size:11px;opacity:.55;text-transform:uppercase;letter-spacing:.08em;padding:8px 12px 5px}
+.nav{padding:10px 12px;border-radius:7px;font-size:13px;opacity:.9}
+.nav.active{background:#3a4348;box-shadow:inset 3px 0 0 #4e91ff;font-weight:600;opacity:1}
+main{padding:26px 30px}
+.head{display:flex;justify-content:space-between;gap:18px;align-items:flex-end;margin-bottom:18px}
+h1{margin:0;font-size:28px;letter-spacing:-.5px}
+.sub{color:var(--muted);margin-top:6px;font-size:15px}
+.filters{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.filter,.period{border:1px solid var(--border);background:#fff;border-radius:8px}
+.filter{padding:9px 12px;color:var(--text)}
+.period{display:flex;overflow:hidden}
+.period button{border:0;background:#fff;padding:9px 14px;color:var(--text);cursor:pointer}
+.period button+button{border-left:1px solid var(--border)}
+.period .on{background:var(--navy);color:#fff}
+.seg{display:flex;border:1px solid var(--border);border-radius:7px;overflow:hidden}
+.seg button{border:0;background:#fff;padding:9px 12px;font-size:13px;cursor:pointer;color:var(--text)}
+.seg button+button{border-left:1px solid var(--border)}
+.seg .on{background:#edf4ff;color:var(--blue);font-weight:700}
+.seg button:disabled{color:#b6c0cf;cursor:not-allowed;background:#fafbfd}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:20px;min-height:560px}
+.cardhead{display:flex;justify-content:space-between;gap:14px;align-items:flex-start}
+.title{font-size:20px;font-weight:700}
+.desc{font-size:13px;color:var(--muted);margin-top:5px}
+.legend{display:flex;gap:18px;color:var(--muted);font-size:12px;margin:14px 0 8px;flex-wrap:wrap}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:11px;height:11px;border-radius:2px;display:inline-block}.cur{background:var(--blue)}.prev{background:#aebee0}.dot{width:10px;height:10px;background:var(--red);border-radius:50%}
+.tl{width:18px;height:0;border-top:3px solid var(--amber);display:inline-block;position:relative}.tl:after{content:"";position:absolute;left:6px;top:-3.5px;width:5px;height:5px;border-radius:50%;background:var(--amber)}
+.line-sw{width:20px;height:3px;border-radius:2px;background:#ec4899;display:inline-block;position:relative}.line-sw:after{content:"";position:absolute;left:7px;top:-2.5px;width:7px;height:7px;border-radius:50%;background:#ec4899}
+.chart{width:100%;height:430px}
+.chart svg{width:100%;height:100%;display:block}
+.card.tall .chart{height:520px}
+.note{font-size:11px;color:var(--muted);margin-top:7px}
+.empty{height:430px;border:1px dashed var(--border);border-radius:9px;background:#fbfcfe;display:grid;place-items:center;color:var(--muted);text-align:center;padding:30px}
+@media(max-width:1100px){.grid{grid-template-columns:1fr}.app{grid-template-columns:74px 1fr}.nav,.section{font-size:0;text-align:center}.nav:before{content:"\2022";font-size:18px}}
+@media(max-width:760px){.app{display:block}.sidebar{display:none}.head{display:block}.filters{margin-top:14px}main{padding:18px}.topbar{padding:0 14px}.embark{display:none}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="topbar">
+  <div class="hamburger">&#9776;</div>
+  <div class="logo"><span style="color:#e9344f">m</span>Prompto</div>
+  <select class="client"><option>Embark perfumes</option></select>
+  <div class="embark">EMBARK</div>
+</header>
+<aside class="sidebar">
+  <div class="section">Analytics</div>
+  <div class="nav">Live</div><div class="nav">Overview</div><div class="nav active">Merchandising</div>
+  <div class="nav">Intent</div><div class="nav">Journey</div><div class="nav">Impact</div>
+  <div class="section" style="margin-top:12px">Admin</div><div class="nav">Clients</div><div class="nav">Manage Catalog</div>
+</aside>
+<main>
+  <div class="head">
+    <div><h1>Merchandising Dashboard</h1><div class="sub">Bestseller (Volume) &amp; Velocity (Conversion)</div></div>
+    <div class="filters">
+      <div class="seg" id="mode"><button class="on" data-m="category">Categories</button><button data-m="product">Products</button></div>
+      <select class="filter" id="category"><option>All Categories</option></select>
+      <select class="filter"><option>All Devices</option></select>
+      <div class="period" id="period">
+        <button class="on" data-p="7D">7D</button><button data-p="14D">14D</button><button data-p="30D">30D</button>
+      </div>
+    </div>
+  </div>
+  <section class="grid">
+    <article class="card" id="volCard">
+      <div class="cardhead"><div><div class="title">Bestseller &mdash; Add to Cart Volume</div><div class="desc" id="volDesc">Previous vs current Add to Cart (ATC), by category.</div></div></div>
+      <div class="legend"><span><i class="sw prev"></i><span id="volPrevLabel">Previous 7D</span></span><span><i class="sw cur"></i><span id="volCurLabel">Current 7D</span></span><span><b style="color:#16a36a">+N</b>&nbsp;/&nbsp;<b style="color:#e9344f">&minus;N</b>&nbsp;ATC change vs previous</span></div>
+      <div class="chart" id="volume"></div>
+    </article>
+    <article class="card" id="velCard">
+      <div class="cardhead"><div><div class="title">Velocity &ndash; Conversion Efficiency</div><div class="desc" id="velDesc">What % of PDP views convert to Add to Cart?</div></div></div>
+      <div class="legend"><span><i class="sw prev"></i>Previous velocity</span><span><i class="sw cur"></i>Current velocity</span><span><i class="line-sw"></i>Change (pp)</span></div>
+      <div class="chart" id="velocity"></div>
+      <div class="note">Velocity (%) = current ATC &divide; current PDP views (left axis). The pink line is the change vs the previous period in percentage points (right axis); each point's pill is green when up, red when down.</div>
+    </article>
+  </section>
+</main>
+</div>
+<script>
+const DATA = {"categories":[{"name":"Eau de Parfum for Him","type":"category","category":"Eau de Parfum for Him","vol":{"7D":{"prev":828.0,"cur":717.0,"pct":-13.41},"14D":{"prev":2323.0,"cur":1545.0,"pct":-33.49},"30D":{"prev":1396.0,"cur":4227.0,"pct":202.79}},"vel":{"7D":{"pv":13.18,"cv":10.68,"pp":-2.5,"dir":"DOWN","impact":-71.91},"14D":{"pv":12.86,"cv":11.97,"pp":-0.9,"dir":"DOWN","impact":-52.98},"30D":{"pv":9.88,"cv":12.55,"pp":2.67,"dir":"UP","impact":406.65}}},{"name":"Eau de Parfum for Her","type":"category","category":"Eau de Parfum for Her","vol":{"7D":{"prev":620.0,"cur":467.0,"pct":-24.68},"14D":{"prev":1517.0,"cur":1087.0,"pct":-28.35},"30D":{"prev":1117.0,"cur":2807.0,"pct":151.3}},"vel":{"7D":{"pv":12.1,"cv":11.61,"pp":-0.49,"dir":"DOWN","impact":-9.49},"14D":{"pv":13.0,"cv":11.88,"pp":-1.13,"dir":"DOWN","impact":-47.69},"30D":{"pv":10.27,"cv":12.6,"pp":2.33,"dir":"UP","impact":229.18}}},{"name":"Eau de Parfum for All","type":"category","category":"Eau de Parfum for All","vol":{"7D":{"prev":94.0,"cur":129.0,"pct":37.23},"14D":{"prev":710.0,"cur":223.0,"pct":-68.59},"30D":{"prev":670.0,"cur":964.0,"pct":43.88}},"vel":{"7D":{"pv":6.16,"cv":6.72,"pp":0.56,"dir":"UP","impact":5.13},"14D":{"pv":9.23,"cv":6.45,"pp":-2.78,"dir":"DOWN","impact":-49.06},"30D":{"pv":7.04,"cv":8.27,"pp":1.23,"dir":"UP","impact":69.81}}},{"name":"Deodorant for Her","type":"category","category":"Deodorant for Her","vol":{"7D":{"prev":50.0,"cur":48.0,"pct":-4.0},"14D":{"prev":73.0,"cur":98.0,"pct":34.25},"30D":{"prev":218.0,"cur":181.0,"pct":-16.97}},"vel":{"7D":{"pv":29.7,"cv":26.67,"pp":-3.04,"dir":"DOWN","impact":-3.19},"14D":{"pv":18.75,"cv":28.16,"pp":9.41,"dir":"UP","impact":19.38},"30D":{"pv":20.76,"cv":23.23,"pp":2.47,"dir":"UP","impact":10.85}}},{"name":"Deodorant for Him","type":"category","category":"Deodorant for Him","vol":{"7D":{"prev":43.0,"cur":30.0,"pct":-30.23},"14D":{"prev":117.0,"cur":73.0,"pct":-37.61},"30D":{"prev":314.0,"cur":192.0,"pct":-38.85}},"vel":{"7D":{"pv":21.93,"cv":22.35,"pp":0.42,"dir":"UP","impact":0.36},"14D":{"pv":21.38,"cv":22.11,"pp":0.73,"dir":"UP","impact":1.45},"30D":{"pv":20.38,"cv":21.17,"pp":0.79,"dir":"UP","impact":4.18}}}],"products":[{"name":"Embark My Dream for Her Eau De Parfum EDP","type":"product","category":"Eau de Parfum for Her","vol":{"7D":{"prev":279.0,"cur":214.0,"pct":-23.3},"14D":{"prev":614.0,"cur":493.0,"pct":-19.71},"30D":{"prev":466.0,"cur":1177.0,"pct":152.58}},"vel":{"7D":{"pv":10.89,"cv":11.41,"pp":0.52,"dir":"UP","impact":4.31},"14D":{"pv":11.56,"cv":11.12,"pp":-0.44,"dir":"DOWN","impact":-7.87},"30D":{"pv":8.62,"cv":11.47,"pp":2.85,"dir":"UP","impact":111.39}}},{"name":"Blaze","type":"product","category":"Eau de Parfum for Him","vol":{"7D":{"prev":192.0,"cur":177.0,"pct":-7.81},"14D":{"prev":523.0,"cur":369.0,"pct":-29.45},"30D":{"prev":279.0,"cur":1001.0,"pct":258.78}},"vel":{"7D":{"pv":16.06,"cv":14.64,"pp":-1.42,"dir":"DOWN","impact":-6.9},"14D":{"pv":14.18,"cv":15.38,"pp":1.2,"dir":"UP","impact":12.1},"30D":{"pv":10.2,"cv":14.72,"pp":4.51,"dir":"UP","impact":122.94}}},{"name":"Fuel","type":"product","category":"Eau de Parfum for Him","vol":{"7D":{"prev":203.0,"cur":170.0,"pct":-16.26},"14D":{"prev":512.0,"cur":373.0,"pct":-27.15},"30D":{"prev":278.0,"cur":985.0,"pct":254.32}},"vel":{"7D":{"pv":16.45,"cv":11.76,"pp":-4.69,"dir":"DOWN","impact":-27.09},"14D":{"pv":16.94,"cv":14.19,"pp":-2.75,"dir":"DOWN","impact":-32.99},"30D":{"pv":12.43,"cv":15.74,"pp":3.3,"dir":"UP","impact":97.01}}},{"name":"Wave","type":"product","category":"Eau de Parfum for Him","vol":{"7D":{"prev":167.0,"cur":111.0,"pct":-33.53},"14D":{"prev":467.0,"cur":278.0,"pct":-40.47},"30D":{"prev":259.0,"cur":816.0,"pct":215.06}},"vel":{"7D":{"pv":12.72,"cv":10.2,"pp":-2.52,"dir":"DOWN","impact":-13.85},"14D":{"pv":11.9,"cv":11.64,"pp":-0.26,"dir":"DOWN","impact":-3.33},"30D":{"pv":10.0,"cv":11.98,"pp":1.99,"dir":"UP","impact":68.16}}},{"name":"Embark My Passion for Him Eau De Parfum EDP","type":"product","category":"Eau de Parfum for Him","vol":{"7D":{"prev":67.0,"cur":80.0,"pct":19.4},"14D":{"prev":159.0,"cur":147.0,"pct":-7.55},"30D":{"prev":140.0,"cur":319.0,"pct":127.86}},"vel":{"7D":{"pv":12.5,"cv":12.11,"pp":-0.39,"dir":"DOWN","impact":-1.0},"14D":{"pv":11.35,"cv":12.27,"pp":0.92,"dir":"UP","impact":3.98},"30D":{"pv":10.67,"cv":11.65,"pp":0.98,"dir":"UP","impact":9.77}}},{"name":"Beat","type":"product","category":"Eau de Parfum for Her","vol":{"7D":{"prev":94.0,"cur":69.0,"pct":-26.6},"14D":{"prev":255.0,"cur":163.0,"pct":-36.08},"30D":{"prev":167.0,"cur":459.0,"pct":174.85}},"vel":{"7D":{"pv":14.48,"cv":12.99,"pp":-1.5,"dir":"DOWN","impact":-3.46},"14D":{"pv":15.62,"cv":13.82,"pp":-1.8,"dir":"DOWN","impact":-9.36},"30D":{"pv":15.69,"cv":14.84,"pp":-0.85,"dir":"DOWN","impact":-11.56}}},{"name":"Flare","type":"product","category":"Eau de Parfum for Her","vol":{"7D":{"prev":60.0,"cur":52.0,"pct":-13.33},"14D":{"prev":156.0,"cur":112.0,"pct":-28.21},"30D":{"prev":102.0,"cur":291.0,"pct":185.29}},"vel":{"7D":{"pv":13.56,"cv":14.65,"pp":1.09,"dir":"UP","impact":2.15},"14D":{"pv":15.43,"cv":14.06,"pp":-1.37,"dir":"DOWN","impact":-5.96},"30D":{"pv":13.65,"cv":14.64,"pp":0.99,"dir":"UP","impact":10.38}}},{"name":"Thrive","type":"product","category":"Eau de Parfum for Her","vol":{"7D":{"prev":71.0,"cur":50.0,"pct":-29.58},"14D":{"prev":166.0,"cur":121.0,"pct":-27.11},"30D":{"prev":159.0,"cur":322.0,"pct":102.52}},"vel":{"7D":{"pv":13.52,"cv":14.29,"pp":0.76,"dir":"UP","impact":1.81},"14D":{"pv":14.98,"cv":13.87,"pp":-1.1,"dir":"DOWN","impact":-5.73},"30D":{"pv":13.09,"cv":15.17,"pp":2.08,"dir":"UP","impact":26.92}}},{"name":"Embark My Life for Him Eau De Parfum EDP","type":"product","category":"Eau de Parfum for Him","vol":{"7D":{"prev":46.0,"cur":48.0,"pct":4.35},"14D":{"prev":164.0,"cur":94.0,"pct":-42.68},"30D":{"prev":75.0,"cur":279.0,"pct":272.0}},"vel":{"7D":{"pv":10.38,"cv":9.5,"pp":-0.88,"dir":"DOWN","impact":-1.93},"14D":{"pv":12.57,"cv":9.93,"pp":-2.64,"dir":"DOWN","impact":-11.41},"30D":{"pv":7.55,"cv":11.33,"pp":3.78,"dir":"UP","impact":40.03}}},{"name":"Embark My Dream for Her Perfumed Deodorant","type":"product","category":"Deodorant for Her","vol":{"7D":{"prev":43.0,"cur":44.0,"pct":2.33},"14D":{"prev":61.0,"cur":87.0,"pct":42.62},"30D":{"prev":173.0,"cur":155.0,"pct":-10.4}},"vel":{"7D":{"pv":28.57,"cv":29.27,"pp":0.7,"dir":"UP","impact":0.57},"14D":{"pv":19.76,"cv":28.92,"pp":9.16,"dir":"UP","impact":15.2},"30D":{"pv":22.59,"cv":23.86,"pp":1.27,"dir":"UP","impact":4.48}}},{"name":"Embark My Dream Intense for Her Eau De Parfum EDP","type":"product","category":"Eau de Parfum for Her","vol":{"7D":{"prev":49.0,"cur":44.0,"pct":-10.2},"14D":{"prev":118.0,"cur":93.0,"pct":-21.19},"30D":{"prev":98.0,"cur":219.0,"pct":123.47}},"vel":{"7D":{"pv":13.59,"cv":15.09,"pp":1.51,"dir":"UP","impact":2.4},"14D":{"pv":12.88,"cv":14.29,"pp":1.41,"dir":"UP","impact":4.83},"30D":{"pv":11.82,"cv":13.18,"pp":1.36,"dir":"UP","impact":10.23}}},{"name":"Embark My Story for Him Eau De Parfum EDP","type":"product","category":"Eau de Parfum for Him","vol":{"7D":{"prev":50.0,"cur":39.0,"pct":-22.0},"14D":{"prev":170.0,"cur":89.0,"pct":-47.65},"30D":{"prev":78.0,"cur":268.0,"pct":243.59}},"vel":{"7D":{"pv":8.82,"cv":6.79,"pp":-2.04,"dir":"DOWN","impact":-4.5},"14D":{"pv":12.74,"cv":7.84,"pp":-4.9,"dir":"DOWN","impact":-22.48},"30D":{"pv":8.13,"cv":10.15,"pp":2.01,"dir":"UP","impact":21.83}}},{"name":"Embark My Life Intense for Him Eau De Parfum EDP","type":"product","category":"Eau de Parfum for Him","vol":{"7D":{"prev":27.0,"cur":35.0,"pct":29.63},"14D":{"prev":92.0,"cur":62.0,"pct":-32.61},"30D":{"prev":78.0,"cur":167.0,"pct":114.1}},"vel":{"7D":{"pv":11.18,"cv":9.52,"pp":-1.66,"dir":"DOWN","impact":-3.14},"14D":{"pv":9.01,"cv":10.26,"pp":1.26,"dir":"UP","impact":4.29},"30D":{"pv":8.19,"cv":10.01,"pp":1.82,"dir":"UP","impact":15.28}}},{"name":"Embark Wood Oud for All Eau De Parfum EDP","type":"product","category":"Eau de Parfum for All","vol":{"7D":{"prev":29.0,"cur":34.0,"pct":17.24},"14D":{"prev":87.0,"cur":63.0,"pct":-27.59},"30D":{"prev":71.0,"cur":160.0,"pct":125.35}},"vel":{"7D":{"pv":7.14,"cv":6.96,"pp":-0.18,"dir":"DOWN","impact":-0.5},"14D":{"pv":5.77,"cv":7.05,"pp":1.28,"dir":"UP","impact":6.89},"30D":{"pv":5.06,"cv":6.52,"pp":1.46,"dir":"UP","impact":19.27}}},{"name":"Embark Journey Rajasthan for All Eau De Parfum EDP","type":"product","category":"Eau de Parfum for All","vol":{"7D":{"prev":5.0,"cur":33.0,"pct":560.0},"14D":{"prev":26.0,"cur":38.0,"pct":46.15},"30D":{"prev":20.0,"cur":65.0,"pct":225.0}},"vel":{"7D":{"pv":3.51,"cv":10.71,"pp":7.21,"dir":"UP","impact":8.07},"14D":{"pv":7.34,"cv":8.28,"pp":0.94,"dir":"UP","impact":1.59},"30D":{"pv":4.55,"cv":7.78,"pp":3.23,"dir":"UP","impact":11.64}}},{"name":"Embark Journey Goa for All Eau De Parfum EDP","type":"product","category":"Eau de Parfum for All","vol":{"7D":{"prev":16.0,"cur":24.0,"pct":50.0},"14D":{"prev":63.0,"cur":40.0,"pct":-36.51},"30D":{"prev":52.0,"cur":107.0,"pct":105.77}},"vel":{"7D":{"pv":6.14,"cv":10.16,"pp":4.02,"dir":"UP","impact":5.14},"14D":{"pv":8.05,"cv":8.26,"pp":0.22,"dir":"UP","impact":0.53},"30D":{"pv":8.22,"cv":8.01,"pp":-0.22,"dir":"DOWN","impact":-1.38}}},{"name":"Embark My Time for Him Eau De Parfum EDP","type":"product","category":"Eau de Parfum for Him","vol":{"7D":{"prev":31.0,"cur":21.0,"pct":-32.26},"14D":{"prev":103.0,"cur":52.0,"pct":-49.51},"30D":{"prev":48.0,"cur":162.0,"pct":237.5}},"vel":{"7D":{"pv":12.61,"cv":13.4,"pp":0.8,"dir":"UP","impact":0.77},"14D":{"pv":16.14,"cv":12.96,"pp":-3.17,"dir":"DOWN","impact":-6.86},"30D":{"pv":8.4,"cv":14.6,"pp":6.2,"dir":"UP","impact":39.48}}},{"name":"Embark My Story for Him Perfumed Deodorant","type":"product","category":"Deodorant for Him","vol":{"7D":{"prev":19.0,"cur":18.0,"pct":-5.26},"14D":{"prev":51.0,"cur":37.0,"pct":-27.45},"30D":{"prev":121.0,"cur":90.0,"pct":-25.62}},"vel":{"7D":{"pv":27.66,"cv":33.33,"pp":5.67,"dir":"UP","impact":2.04},"14D":{"pv":23.73,"cv":30.12,"pp":6.39,"dir":"UP","impact":5.31},"30D":{"pv":20.48,"cv":25.98,"pp":5.5,"dir":"UP","impact":11.23}}},{"name":"Embark Marine Oud for All Eau De Parfum EDP","type":"product","category":"Eau de Parfum for All","vol":{"7D":{"prev":13.0,"cur":15.0,"pct":15.38},"14D":{"prev":326.0,"cur":28.0,"pct":-91.41},"30D":{"prev":272.0,"cur":360.0,"pct":32.35}},"vel":{"7D":{"pv":3.47,"cv":2.82,"pp":-0.66,"dir":"DOWN","impact":-0.93},"14D":{"pv":11.49,"cv":3.15,"pp":-8.34,"dir":"DOWN","impact":-23.86},"30D":{"pv":7.18,"cv":9.76,"pp":2.58,"dir":"UP","impact":41.82}}},{"name":"Embark My Passion for Her Eau De Parfum EDP","type":"product","category":"Eau de Parfum for Her","vol":{"7D":{"prev":32.0,"cur":15.0,"pct":-53.13},"14D":{"prev":92.0,"cur":47.0,"pct":-48.91},"30D":{"prev":56.0,"cur":152.0,"pct":171.43}},"vel":{"7D":{"pv":16.83,"cv":2.04,"pp":-14.79,"dir":"DOWN","impact":-14.5},"14D":{"pv":9.32,"cv":9.55,"pp":0.23,"dir":"UP","impact":0.46},"30D":{"pv":8.91,"cv":9.2,"pp":0.29,"dir":"UP","impact":1.51}}},{"name":"Embark My Happiness for Him Eau De Parfum EDP","type":"product","category":"Eau de Parfum for Him","vol":{"7D":{"prev":9.0,"cur":14.0,"pct":55.56},"14D":{"prev":42.0,"cur":23.0,"pct":-45.24},"30D":{"prev":32.0,"cur":68.0,"pct":112.5}},"vel":{"7D":{"pv":8.54,"cv":6.12,"pp":-2.41,"dir":"DOWN","impact":-2.37},"14D":{"pv":7.17,"cv":7.22,"pp":0.06,"dir":"UP","impact":0.1},"30D":{"pv":7.07,"cv":6.9,"pp":-0.18,"dir":"DOWN","impact":-0.92}}},{"name":"Embark My Dream for Him Eau De Parfum EDP","type":"product","category":"Eau de Parfum for Him","vol":{"7D":{"prev":18.0,"cur":12.0,"pct":-33.33},"14D":{"prev":54.0,"cur":30.0,"pct":-44.44},"30D":{"prev":86.0,"cur":95.0,"pct":10.47}},"vel":{"7D":{"pv":7.87,"cv":6.17,"pp":-1.69,"dir":"DOWN","impact":-1.37},"14D":{"pv":9.62,"cv":7.06,"pp":-2.56,"dir":"DOWN","impact":-4.35},"30D":{"pv":10.45,"cv":9.26,"pp":-1.19,"dir":"DOWN","impact":-6.28}}},{"name":"Embark Journey Kerala for All Eau De Parfum EDP","type":"product","category":"Eau de Parfum for All","vol":{"7D":{"prev":14.0,"cur":11.0,"pct":-21.43},"14D":{"prev":24.0,"cur":25.0,"pct":4.17},"30D":{"prev":16.0,"cur":51.0,"pct":218.75}},"vel":{"7D":{"pv":9.47,"cv":8.33,"pp":-1.14,"dir":"DOWN","impact":-1.09},"14D":{"pv":5.34,"cv":8.9,"pp":3.56,"dir":"UP","impact":6.79},"30D":{"pv":2.97,"cv":6.85,"pp":3.88,"dir":"UP","impact":18.69}}},{"name":"Embark Ananda for Him Eau De Parfum EDP","type":"product","category":"Eau de Parfum for Him","vol":{"7D":{"prev":18.0,"cur":10.0,"pct":-44.44},"14D":{"prev":37.0,"cur":28.0,"pct":-24.32},"30D":{"prev":43.0,"cur":67.0,"pct":55.81}},"vel":{"7D":{"pv":10.87,"cv":3.03,"pp":-7.84,"dir":"DOWN","impact":-7.76},"14D":{"pv":5.84,"cv":6.81,"pp":0.97,"dir":"UP","impact":1.85},"30D":{"pv":9.26,"cv":6.21,"pp":-3.05,"dir":"DOWN","impact":-14.74}}},{"name":"Embark My Happiness for Her Eau De Parfum EDP","type":"product","category":"Eau de Parfum for Her","vol":{"7D":{"prev":19.0,"cur":10.0,"pct":-47.37},"14D":{"prev":50.0,"cur":29.0,"pct":-42.0},"30D":{"prev":22.0,"cur":85.0,"pct":286.36}},"vel":{"7D":{"pv":11.76,"cv":4.29,"pp":-7.48,"dir":"DOWN","impact":-5.24},"14D":{"pv":15.95,"cv":8.39,"pp":-7.56,"dir":"DOWN","impact":-11.72},"30D":{"pv":7.48,"cv":12.28,"pp":4.79,"dir":"UP","impact":16.01}}},{"name":"Embark My Story for Her Eau De Parfum EDP","type":"product","category":"Eau de Parfum for Her","vol":{"7D":{"prev":12.0,"cur":10.0,"pct":-16.67},"14D":{"prev":57.0,"cur":22.0,"pct":-61.4},"30D":{"prev":36.0,"cur":84.0,"pct":133.33}},"vel":{"7D":{"pv":6.9,"cv":10.29,"pp":3.4,"dir":"UP","impact":2.31},"14D":{"pv":13.53,"cv":8.39,"pp":-5.14,"dir":"DOWN","impact":-7.97},"30D":{"pv":7.49,"cv":11.34,"pp":3.85,"dir":"UP","impact":14.95}}},{"name":"Embark Journey Kashmir for All Eau De Parfum EDP","type":"product","category":"Eau de Parfum for All","vol":{"7D":{"prev":10.0,"cur":8.0,"pct":-20.0},"14D":{"prev":15.0,"cur":18.0,"pct":20.0},"30D":{"prev":17.0,"cur":35.0,"pct":105.88}},"vel":{"7D":{"pv":10.29,"cv":4.62,"pp":-5.68,"dir":"DOWN","impact":-3.69},"14D":{"pv":4.69,"cv":7.52,"pp":2.83,"dir":"UP","impact":3.77},"30D":{"pv":3.77,"cv":5.76,"pp":2.0,"dir":"UP","impact":6.92}}},{"name":"Embark My Time for Him Perfumed Deodorant","type":"product","category":"Deodorant for Him","vol":{"7D":{"prev":15.0,"cur":7.0,"pct":-53.33},"14D":{"prev":28.0,"cur":22.0,"pct":-21.43},"30D":{"prev":81.0,"cur":50.0,"pct":-38.27}},"vel":{"7D":{"pv":21.88,"cv":26.32,"pp":4.44,"dir":"UP","impact":0.84},"14D":{"pv":17.65,"cv":23.53,"pp":5.88,"dir":"UP","impact":3.0},"30D":{"pv":21.24,"cv":19.23,"pp":-2.01,"dir":"DOWN","impact":-3.13}}},{"name":"Embark My Life for Him Perfumed Deodorant","type":"product","category":"Deodorant for Him","vol":{"7D":{"prev":9.0,"cur":5.0,"pct":-44.44},"14D":{"prev":38.0,"cur":14.0,"pct":-63.16},"30D":{"prev":112.0,"cur":52.0,"pct":-53.57}},"vel":{"7D":{"pv":14.29,"cv":6.67,"pp":-7.62,"dir":"DOWN","impact":-2.29},"14D":{"pv":22.45,"cv":10.77,"pp":-11.68,"dir":"DOWN","impact":-7.59},"30D":{"pv":19.71,"cv":17.16,"pp":-2.55,"dir":"DOWN","impact":-4.32}}},{"name":"Embark Floral Oud for All Eau De Parfum EDP","type":"product","category":"Eau de Parfum for All","vol":{"7D":{"prev":7.0,"cur":4.0,"pct":-42.86},"14D":{"prev":169.0,"cur":11.0,"pct":-93.49},"30D":{"prev":222.0,"cur":186.0,"pct":-16.22}},"vel":{"7D":{"pv":3.0,"cv":2.8,"pp":-0.2,"dir":"DOWN","impact":-0.21},"14D":{"pv":12.62,"cv":2.9,"pp":-9.72,"dir":"DOWN","impact":-20.12},"30D":{"pv":9.59,"cv":10.29,"pp":0.7,"dir":"UP","impact":6.3}}},{"name":"Embark My Story for Her Perfumed Deodorant","type":"product","category":"Deodorant for Her","vol":{"7D":{"prev":7.0,"cur":4.0,"pct":-42.86},"14D":{"prev":12.0,"cur":11.0,"pct":-8.33},"30D":{"prev":45.0,"cur":26.0,"pct":-42.22}},"vel":{"7D":{"pv":35.29,"cv":17.39,"pp":-17.9,"dir":"DOWN","impact":-4.12},"14D":{"pv":14.63,"cv":25.0,"pp":10.37,"dir":"UP","impact":4.15},"30D":{"pv":15.87,"cv":20.69,"pp":4.82,"dir":"UP","impact":4.2}}},{"name":"Embark Ananda for Her Eau De Parfum EDP","type":"product","category":"Eau de Parfum for Her","vol":{"7D":{"prev":4.0,"cur":3.0,"pct":-25.0},"14D":{"prev":9.0,"cur":7.0,"pct":-22.22},"30D":{"prev":11.0,"cur":18.0,"pct":63.64}},"vel":{"7D":{"pv":0.0,"cv":5.0,"pp":5.0,"dir":"UP","impact":3.0},"14D":{"pv":3.42,"cv":2.94,"pp":-0.48,"dir":"DOWN","impact":-0.49},"30D":{"pv":4.84,"cv":3.36,"pp":-1.48,"dir":"DOWN","impact":-3.52}}},{"name":"Embark My Freedom for Her Eau De Parfum EDP","type":"product","category":"Eau de Parfum for Her","vol":{"7D":{"prev":0.0,"cur":0.0,"pct":null},"14D":{"prev":0.0,"cur":0.0,"pct":null},"30D":{"prev":0.0,"cur":0.0,"pct":null}},"vel":{"7D":{"pv":null,"cv":null,"pp":null,"dir":"NEW / INSUFFICIENT HISTORY","impact":null},"14D":{"pv":null,"cv":null,"pp":null,"dir":"NEW / INSUFFICIENT HISTORY","impact":null},"30D":{"pv":null,"cv":null,"pp":null,"dir":"NEW / INSUFFICIENT HISTORY","impact":null}}}]};
+let period="7D", mode="category";
+const PROD_LIMIT=8;
+
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmt=n=>Number(Math.round(n)).toLocaleString("en-IN");
+const wrap=(s,max=15)=>{const w=s.split(" "),o=[];let l="";for(const x of w){let n=l?l+" "+x:x;if(n.length>max&&l){o.push(l);l=x}else l=n}if(l)o.push(l);return o.slice(0,3)};
+const shortName=s=>s.replace(/^Embark /,"").replace(/ Eau De Parfum EDP$/," EDP").replace(/ Perfumed Deodorant$/," Deo");
+function selCat(){return document.getElementById("category").value;}
+function effectiveMode(){return selCat()!=="All Categories"?"product":mode;}
+function prodsIn(){const c=selCat();return DATA.products.filter(p=>c==="All Categories"||p.category===c);}
+
+/* ---------- Bestseller: previous vs current ATC ---------- */
+function volume(){
+  const el=document.getElementById("volume"),card=document.getElementById("volCard");
+  const c=selCat(),prod=effectiveMode()==="product";
+  let rows=(prod?prodsIn():DATA.categories).map(r=>({n:r.name,prev:r.vol[period].prev,cur:r.vol[period].cur,pct:r.vol[period].pct}))
+    .filter(d=>d.cur!=null);
+  rows.sort((a,b)=>b.cur-a.cur);          // sorted by current ATC, descending
+  if(prod) rows=rows.slice(0,PROD_LIMIT);
+  card.classList.toggle("tall",prod);
+  document.getElementById("volPrevLabel").textContent=`Previous ${period}`;
+  document.getElementById("volCurLabel").textContent=`Current ${period}`;
+  document.getElementById("volDesc").textContent=prod
+    ? (c!=="All Categories" ? `Top ${rows.length} products in ${c} — previous vs current ATC (${period}).` : `Top ${rows.length} products — previous vs current ATC (${period}).`)
+    : `Previous vs current Add to Cart (ATC), by category (${period}).`;
+  if(!rows.length){el.innerHTML='<div class="empty">No data for this selection.</div>';return}
+  const n=rows.length,H=prod?520:430,W=Math.max(760,n*(prod?110:150)),L=58,R=22,T=44,B=prod?104:92,CH=H-T-B,CW=W-L-R;
+  const max=Math.max(...rows.flatMap(d=>[d.prev,d.cur]),1),step=niceStep(max),top=Math.ceil(max/step)*step;
+  const scale=v=>T+CH-v/top*CH,gap=CW/n,bw=Math.min(46,gap*.3);
+  let s=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">`;
+  for(let v=0;v<=top;v+=step){const y=scale(v);s+=`<line x1="${L}" y1="${y.toFixed(1)}" x2="${W-R}" y2="${y.toFixed(1)}" stroke="#eef2f7"/><text x="${L-10}" y="${(y+4).toFixed(1)}" text-anchor="end" font-size="11" fill="#94a2b6">${fmt(v)}</text>`;}
+  s+=`<line x1="${L}" y1="${T}" x2="${L}" y2="${T+CH}" stroke="#e1e7ef"/>`;
+  rows.forEach((d,i)=>{const cx=L+gap*i+gap/2,x1=cx-bw-4,x2=cx+4,y1=scale(d.prev),y2=scale(d.cur);
+    s+=`<rect x="${x1.toFixed(1)}" y="${y1.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(0,T+CH-y1).toFixed(1)}" rx="4" fill="#aebee0"><title>${esc(d.n)}: previous ${fmt(d.prev)}</title></rect>`;
+    s+=`<rect x="${x2.toFixed(1)}" y="${y2.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(0,T+CH-y2).toFixed(1)}" rx="4" fill="#1769e0"><title>${esc(d.n)}: current ${fmt(d.cur)}</title></rect>`;
+    s+=`<text x="${(x1+bw/2).toFixed(1)}" y="${(y1-6).toFixed(1)}" text-anchor="middle" font-size="10" font-weight="700" fill="#7c8ba6">${fmt(d.prev)}</text>`;
+    s+=`<text x="${(x2+bw/2).toFixed(1)}" y="${(y2-6).toFixed(1)}" text-anchor="middle" font-size="10" font-weight="700" fill="#182a42">${fmt(d.cur)}</text>`;
+    changeBadge(d,cx,Math.min(y1,y2));
+    wrap(shortName(d.n),prod?13:16).forEach((t,j)=>s+=`<text x="${cx.toFixed(1)}" y="${T+CH+20+j*12}" text-anchor="middle" font-size="10" fill="#5b6a80">${esc(t)}</text>`);});
+  function changeBadge(d,cx,yTopBar){
+    const diff=d.cur-d.prev, pct=(d.pct!=null)?d.pct:(d.prev?diff/d.prev*100:0);
+    const up=diff>=0, col=up?"#16a36a":"#e9344f", bg=up?"#e7f7ee":"#fdeaee";
+    const label=`${up?"+":""}${fmt(diff)}`, w=Math.max(46,label.length*7.6), by=Math.max(16,yTopBar-24);
+    s+=`<rect x="${(cx-w/2).toFixed(1)}" y="${(by-13).toFixed(1)}" width="${w.toFixed(1)}" height="18" rx="9" fill="${bg}" stroke="${col}" stroke-opacity=".4"/><text x="${cx.toFixed(1)}" y="${(by).toFixed(1)}" text-anchor="middle" font-size="10" font-weight="800" fill="${col}"><title>${esc(d.n)}: ${up?"+":""}${fmt(diff)} ATC vs previous</title>${label}</text>`;}
+  s+=`</svg>`;el.innerHTML=s;
+}
+
+/* ---------- Velocity: prev/current bars + trend line ---------- */
+function velocity(){
+  const el=document.getElementById("velocity"),card=document.getElementById("velCard");
+  const c=selCat(),prod=effectiveMode()==="product";
+  let rows=(prod?prodsIn():DATA.categories)
+    .filter(r=>r.vel&&r.vel[period]&&r.vel[period].cv!=null)
+    .map(r=>({n:r.name,pv:r.vel[period].pv,cv:r.vel[period].cv,pp:r.vel[period].pp}));
+  rows.sort((a,b)=>b.cv-a.cv);
+  if(prod) rows=rows.slice(0,PROD_LIMIT);
+  card.classList.toggle("tall",prod);
+  document.getElementById("velDesc").textContent=prod
+    ? (c!=="All Categories" ? `Top ${rows.length} products in ${c}, PDP-to-ATC rate (${period}).` : `Top ${rows.length} products by PDP-to-ATC rate (${period}).`)
+    : `Add to Cart rate vs product-page views, by category (${period}).`;
+  if(!rows.length){el.innerHTML='<div class="empty">No velocity data for this selection.</div>';return}
+  const n=rows.length,H=prod?520:430,W=Math.max(760,n*(prod?116:156)),L=58,R=58,T=40,B=prod?104:92,CH=H-T-B,CW=W-L-R;
+  // left axis = velocity %
+  const dataMax=Math.max(...rows.flatMap(d=>[d.pv,d.cv]),10),step=niceStep(dataMax),top=Math.ceil(dataMax/step)*step;
+  const scale=v=>T+CH-v/top*CH,gap=CW/n,bw=Math.min(32,gap*.24);
+  // right axis = change (pp), centered on zero
+  const ppMax=Math.max(5,...rows.map(d=>Math.abs(d.pp||0))),ppStep=ppMax<=5?5:(ppMax<=10?5:(ppMax<=20?10:20)),ppTop=Math.ceil(ppMax/ppStep)*ppStep;
+  const yPP=v=>(T+CH/2)-(v/ppTop)*(CH/2);
+  let s=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">`;
+  // left gridlines + % labels
+  for(let v=0;v<=top;v+=step){const y=scale(v);s+=`<line x1="${L}" y1="${y.toFixed(1)}" x2="${W-R}" y2="${y.toFixed(1)}" stroke="#eef2f7"/><text x="${L-10}" y="${(y+4).toFixed(1)}" text-anchor="end" font-size="11" fill="#94a2b6">${v}%</text>`;}
+  s+=`<line x1="${L}" y1="${T}" x2="${L}" y2="${T+CH}" stroke="#e1e7ef"/>`;
+  // right axis pp labels
+  [ppTop,ppTop/2,0,-ppTop/2,-ppTop].forEach(v=>{const y=yPP(v);s+=`<text x="${W-R+10}" y="${(y+4).toFixed(1)}" text-anchor="start" font-size="10" fill="#9aa4b2">${v>0?"+":""}${v}</text>`;});
+  // bars: lavender previous, purple current
+  rows.forEach((d,i)=>{const cx=L+gap*i+gap/2,x1=cx-bw-4,x2=cx+4,y1=scale(d.pv),y2=scale(d.cv);
+    s+=`<rect x="${x1.toFixed(1)}" y="${y1.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(0,T+CH-y1).toFixed(1)}" rx="4" fill="#aebee0"><title>${esc(d.n)}: previous ${d.pv}%</title></rect>`;
+    s+=`<rect x="${x2.toFixed(1)}" y="${y2.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(0,T+CH-y2).toFixed(1)}" rx="4" fill="#1769e0"><title>${esc(d.n)}: current ${d.cv}%</title></rect>`;
+    s+=`<text x="${(x1+bw/2).toFixed(1)}" y="${(y1-6).toFixed(1)}" text-anchor="middle" font-size="10" font-weight="700" fill="#7c8ba6">${d.pv.toFixed(2)}%</text>`;
+    s+=`<text x="${(x2+bw/2).toFixed(1)}" y="${(y2-6).toFixed(1)}" text-anchor="middle" font-size="10" font-weight="700" fill="#182a42">${d.cv.toFixed(2)}%</text>`;
+    wrap(shortName(d.n),prod?13:16).forEach((t,j)=>s+=`<text x="${cx.toFixed(1)}" y="${T+CH+20+j*12}" text-anchor="middle" font-size="10" fill="#5b6a80">${esc(t)}</text>`);});
+  // pink change-pp line on the right axis
+  const pts=rows.map((d,i)=>[L+gap*i+gap/2, yPP(d.pp||0)]);
+  if(pts.length>1){const path=pts.map((p,i)=>`${i?"L":"M"}${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(" ");
+    s+=`<path d="${path}" fill="none" stroke="#ec4899" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>`;}
+  rows.forEach((d,i)=>{const p=pts[i],up=(d.pp||0)>=0,col=up?"#16a36a":"#e9344f",bg=up?"#e7f7ee":"#fdeaee";
+    s+=`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="5" fill="#ec4899" stroke="#fff" stroke-width="1.5"><title>${esc(d.n)}: change ${up?"+":""}${d.pp}pp</title></circle>`;
+    const lbl=`${up?"+":""}${(d.pp||0).toFixed(2)}`,w=Math.max(42,lbl.length*7.4);
+    s+=`<rect x="${(p[0]-w/2).toFixed(1)}" y="${(p[1]+10).toFixed(1)}" width="${w.toFixed(1)}" height="18" rx="9" fill="${bg}" stroke="${col}" stroke-opacity=".4"/><text x="${p[0].toFixed(1)}" y="${(p[1]+23).toFixed(1)}" text-anchor="middle" font-size="10" font-weight="800" fill="${col}">${lbl}</text>`;});
+  s+=`</svg>`;el.innerHTML=s;
+}
+
+function niceStep(max){return max<=20?5:(max<=60?10:(max<=200?50:(max<=1000?200:500)));}
+
+function syncModeUI(){
+  const single=selCat()!=="All Categories",eff=effectiveMode();
+  document.querySelectorAll("#mode button").forEach(b=>{const isCat=b.dataset.m==="category";b.classList.toggle("on",b.dataset.m===eff);b.disabled=single&&isCat;b.title=single&&isCat?"Pick All Categories to compare categories":"";});
+}
+function render(){syncModeUI();volume();velocity();}
+document.querySelectorAll("#period button").forEach(b=>b.onclick=()=>{document.querySelectorAll("#period button").forEach(x=>x.classList.remove("on"));b.classList.add("on");period=b.dataset.p;render();});
+document.querySelectorAll("#mode button").forEach(b=>b.onclick=()=>{if(b.disabled)return;mode=b.dataset.m;render();});
+document.getElementById("category").onchange=render;
+DATA.categories.forEach(x=>{const o=document.createElement("option");o.value=x.name;o.textContent=x.name;document.getElementById("category").appendChild(o);});
+render();
+</script>
+</body>
+</html>
