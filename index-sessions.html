@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>mPrompto — Sessions Before Conversion</title>
+<style>
+:root{
+  --blue:#1769e0; --red:#e9344f; --navy:#14243a; --sidebar:#30383d;
+  --text:#182a42; --muted:#6c7b90; --border:#e1e7ef; --grid:#edf1f6; --bg:#f6f8fb;
+  --s1:#3b82f6; --s2:#e9344f; --s3:#84b93f; --s4:#8b5cf6;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text)}
+.app{min-height:100vh;display:grid;grid-template-columns:218px 1fr;grid-template-rows:64px 1fr}
+.topbar{grid-column:1/-1;background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:18px;padding:0 22px}
+.hamburger{font-size:18px}
+.logo{font-size:20px;font-weight:800;letter-spacing:-.8px;color:var(--blue)}
+.client{border:1px solid var(--blue);border-radius:8px;padding:9px 12px;background:#fff;color:var(--text);min-width:170px}
+.embark{margin-left:auto;font:20px Georgia,serif}
+.sidebar{background:var(--sidebar);color:#fff;padding:14px 9px}
+.section{font-size:11px;opacity:.55;text-transform:uppercase;letter-spacing:.08em;padding:8px 12px 5px}
+.nav{padding:10px 12px;border-radius:7px;font-size:13px;opacity:.9}
+.nav.active{background:#3a4348;box-shadow:inset 3px 0 0 #4e91ff;font-weight:600;opacity:1}
+main{padding:26px 30px}
+.head{display:flex;justify-content:space-between;gap:18px;align-items:flex-end;margin-bottom:18px;flex-wrap:wrap}
+h1{margin:0;font-size:28px;letter-spacing:-.5px}
+.sub{color:var(--muted);margin-top:6px;font-size:15px}
+.filters{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.seg{display:flex;border:1px solid var(--border);border-radius:8px;overflow:hidden;background:#fff}
+.seg button{border:0;background:#fff;padding:9px 14px;font-size:13px;cursor:pointer;color:var(--muted);font-weight:600}
+.seg button+button{border-left:1px solid var(--border)}
+.seg .on{background:var(--navy);color:#fff}
+.card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:22px 24px}
+.card .title{font-size:21px;font-weight:800;text-align:center;letter-spacing:.3px;color:#0f1729}
+.card .desc{font-size:13px;color:var(--muted);text-align:center;margin-top:5px}
+.legend{display:flex;gap:20px;justify-content:center;color:var(--muted);font-size:12.5px;margin:14px 0 4px;flex-wrap:wrap}
+.legend span{display:inline-flex;align-items:center;gap:7px}
+.sw{width:12px;height:12px;border-radius:3px;display:inline-block}
+.chart{width:100%;overflow-x:auto}.chart svg{display:block;max-width:100%;height:auto}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:18px}
+.kpi{border:1px solid var(--border);border-radius:11px;padding:14px 16px;background:#fbfcfe}
+.kpi .k{font-size:12px;color:var(--muted)}
+.kpi .v{font-size:22px;font-weight:800;margin-top:4px;color:#0f1729}
+.kpi .d{font-size:12px;color:var(--muted);margin-top:3px}
+.up{color:#16a36a}.down{color:#e9344f}
+.note{font-size:11.5px;color:var(--muted);margin-top:14px}
+@media(max-width:1100px){.app{grid-template-columns:74px 1fr}.nav,.section{font-size:0;text-align:center}.nav:before{content:"\2022";font-size:18px}.kpis{grid-template-columns:1fr 1fr}}
+@media(max-width:760px){.app{display:block}.sidebar{display:none}main{padding:18px}.topbar{padding:0 14px}.embark{display:none}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="topbar">
+  <div class="hamburger">&#9776;</div>
+  <div class="logo"><span style="color:#e9344f">m</span>Prompto</div>
+  <select class="client"><option>Embark perfumes</option></select>
+  <div class="embark">EMBARK</div>
+</header>
+<aside class="sidebar">
+  <div class="section">Analytics</div>
+  <div class="nav">Live</div><div class="nav">Overview</div><div class="nav">Merchandising</div>
+  <div class="nav active">Journey</div><div class="nav">Intent</div><div class="nav">Impact</div>
+  <div class="section" style="margin-top:12px">Admin</div><div class="nav">Clients</div><div class="nav">Manage Catalog</div>
+</aside>
+<main>
+  <div class="head">
+    <div><h1>Sessions Before Conversion</h1><div class="sub">How many sessions users take to reach their first Add to Cart &mdash; Engaged vs Non-Engaged.</div></div>
+    <div class="filters">
+      <div class="seg" id="metric"><button class="on" data-m="pct">% share</button><button data-m="count">User count</button></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="title">SESSIONS BEFORE CONVERSION (ATC)</div>
+    <div class="desc" id="desc">Share of converting users by number of sessions to first ATC (July 2026).</div>
+    <div class="legend">
+      <span><i class="sw" style="background:var(--s1)"></i>1 Session</span>
+      <span><i class="sw" style="background:var(--s2)"></i>2 Sessions</span>
+      <span><i class="sw" style="background:var(--s3)"></i>3 Sessions</span>
+      <span><i class="sw" style="background:var(--s4)"></i>4+ Sessions</span>
+    </div>
+    <div class="chart" id="chart"></div>
+    <div class="note">Cohorts: <b>Engaged</b> = accepted a nudge / answered before first ATC; <b>Non-Engaged</b> = converted without engaging. Percentages are the share of each cohort's converting users. Hover any bar for exact counts.</div>
+    <div class="kpis" id="kpis"></div>
+  </div>
+</main>
+</div>
+<script>
+const DATA=[
+  {cohort:"Engaged",     s:[503,49,13,12],  pct:[87.18,8.49,2.25,2.08], total:577},
+  {cohort:"Non-Engaged", s:[4291,634,135,84], pct:[83.42,12.33,2.62,1.63], total:5144}
+];
+const COLORS=["#3b82f6","#e9344f","#84b93f","#8b5cf6"];
+const BUCKETS=["1 Session","2 Sessions","3 Sessions","4+ Sessions"];
+let metric="pct";
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmt=n=>Number(n).toLocaleString("en-US");
+
+function chart(){
+  const el=document.getElementById("chart");
+  const isPct=metric==="pct";
+  const W=900,H=430,T=24,B=54,L=52,R=20,CH=H-T-B,CW=W-L-R;
+  // two cohort panels side by side, 4 bars each
+  const panelGap=54, panelW=(CW-panelGap)/2;
+  const vals=DATA.map(d=>isPct?d.pct:d.s);
+  const max=Math.max(...vals.flat(),1);
+  const step=isPct?20:(max<=1000?200:1000), top=Math.ceil(max/step)*step;
+  const scale=v=>T+CH-v/top*CH;
+  let s=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">`;
+  // gridlines + y labels
+  for(let v=0;v<=top;v+=step){const y=scale(v);s+=`<line x1="${L}" y1="${y.toFixed(1)}" x2="${W-R}" y2="${y.toFixed(1)}" stroke="#eef2f7"/><text x="${L-9}" y="${(y+4).toFixed(1)}" text-anchor="end" font-size="11" fill="#94a2b6">${isPct?v+"%":fmt(v)}</text>`;}
+  s+=`<text transform="translate(15 ${T+CH/2}) rotate(-90)" text-anchor="middle" font-size="11" fill="#94a2b6">${isPct?"Share of converting users (%)":"Converting users"}</text>`;
+  DATA.forEach((d,pi)=>{
+    const px=L+pi*(panelW+panelGap);
+    const arr=isPct?d.pct:d.s;
+    const n=arr.length, bgap=panelW/n, bw=Math.min(64,bgap*.62);
+    arr.forEach((v,i)=>{const x=px+i*bgap+(bgap-bw)/2,y=scale(v);
+      s+=`<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(0,T+CH-y).toFixed(1)}" rx="3" fill="${COLORS[i]}"><title>${esc(d.cohort)} — ${BUCKETS[i]}: ${fmt(d.s[i])} users (${d.pct[i]}%)</title></rect>`;
+      const lbl=isPct?d.pct[i].toFixed(2)+"%":fmt(d.s[i]);
+      s+=`<text x="${(x+bw/2).toFixed(1)}" y="${(y-7).toFixed(1)}" text-anchor="middle" font-size="10.5" font-weight="700" fill="#334155">${lbl}</text>`;});
+    // cohort label
+    s+=`<text x="${(px+panelW/2).toFixed(1)}" y="${T+CH+26}" text-anchor="middle" font-size="13" font-weight="700" fill="#0f1729">${esc(d.cohort).toUpperCase()}</text>`;
+    s+=`<text x="${(px+panelW/2).toFixed(1)}" y="${T+CH+42}" text-anchor="middle" font-size="11" fill="#94a2b6">${fmt(d.total)} converting users</text>`;
+  });
+  // divider between panels
+  const midX=L+panelW+panelGap/2;
+  s+=`<line x1="${midX.toFixed(1)}" y1="${T}" x2="${midX.toFixed(1)}" y2="${T+CH}" stroke="#e1e7ef"/>`;
+  s+=`<text x="${midX.toFixed(1)}" y="${T+CH+26}" text-anchor="middle" font-size="10.5" fill="#b6c0cf">COHORT</text>`;
+  s+=`</svg>`;el.innerHTML=s;
+  document.getElementById("desc").textContent=isPct
+    ? "Share of converting users by number of sessions to first ATC (July 2026)."
+    : "Number of converting users by number of sessions to first ATC (July 2026).";
+}
+
+function kpis(){
+  const e=DATA[0], ne=DATA[1];
+  const oneSess=(d)=>d.pct[0];
+  const multi=(d)=>(100-d.pct[0]).toFixed(1);
+  const el=document.getElementById("kpis");
+  el.innerHTML=`
+   <div class="kpi"><div class="k">Engaged — convert in 1 session</div><div class="v">${e.pct[0]}%</div><div class="d">${fmt(e.s[0])} of ${fmt(e.total)} users</div></div>
+   <div class="kpi"><div class="k">Non-Engaged — convert in 1 session</div><div class="v">${ne.pct[0]}%</div><div class="d">${fmt(ne.s[0])} of ${fmt(ne.total)} users</div></div>
+   <div class="kpi"><div class="k">Engaged edge (1-session)</div><div class="v ${e.pct[0]>=ne.pct[0]?'up':'down'}">${(e.pct[0]-ne.pct[0]>=0?'+':'')}${(e.pct[0]-ne.pct[0]).toFixed(2)} pp</div><div class="d">Engaged buy faster</div></div>
+   <div class="kpi"><div class="k">Need 2+ sessions</div><div class="v">${multi(e)}% <span style="font-size:13px;color:#94a2b6">vs</span> ${multi(ne)}%</div><div class="d">Engaged vs Non-Engaged</div></div>`;
+}
+
+function render(){chart();kpis();}
+document.querySelectorAll("#metric button").forEach(b=>b.onclick=()=>{document.querySelectorAll("#metric button").forEach(x=>x.classList.remove("on"));b.classList.add("on");metric=b.dataset.m;render();});
+render();
+</script>
+</body>
+</html>
