@@ -66,15 +66,14 @@ h1{margin:0;font-size:26px;font-weight:800;letter-spacing:-.3px;color:#0f1729}
 const D={
   win:{start:"2026-09-20",end:"2026-09-27"},
   total:{u:5240,p:100.0},
-  rec:{u:255,p:4.87},
-  nonrec:{u:5006,p:95.53},
-  recInteract:{u:143,p:56.08},        // % of rec journeys
-  recPdp:{u:253,p:99.22},             // % of rec journeys
-  recAtc:{u:89,p:34.9},               // % of rec journeys
-  recProdAtc:{u:49,p:55.06},          // % of rec ATC
-  diffProdAtc:{u:40,p:44.94},         // % of rec ATC
+  rec:{u:234,p:4.47},                 // distinct users, % of total
+  nonrec:{u:5006,p:95.53},            // distinct users, % of total
+  recPdp:{u:218,p:93.16},             // % of rec users
+  recAtc:{u:77,p:35.32},              // % of rec PDP visitors
+  recProdAtc:{u:47,p:61.04},          // % of rec ATC users
+  diffProdAtc:{u:30,p:38.96},         // % of rec ATC users
   nonrecPdp:{u:2456,p:49.06},         // % of non-rec users
-  nonrecAtc:{u:931,p:18.6}            // % of non-rec users
+  nonrecAtc:{u:621,p:25.29}           // % of non-rec PDP visitors
 };
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const fmt=n=>Number(n).toLocaleString("en-US");
@@ -93,7 +92,7 @@ function flow(){
   let s=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" font-family="Inter,Segoe UI,Arial">`;
 
   // ---- stage headers ----
-  const stages=["1. Total Users","2. Recommendation Exposure","3. Recommended-product Interaction","4. Add to Cart (ATC)","5. ATC Product Breakdown"];
+  const stages=["1. Total Users","2. Recommendation Exposure","3. Visited Product Page","4. Add to Cart (ATC)","5. ATC Product Breakdown"];
   const sx=[70,250,470,690,910], sw=[150,190,190,190,230];
   stages.forEach((t,i)=>{s+=box(sx[i],18,sw[i],38,"#f4f7fb","#e1e7ef",9);wrapT(sx[i]+sw[i]/2,i,t);});
   function wrapT(cx,i,t){const parts=t.split(/(?<=\d\.)\s/);// keep number with text
@@ -122,12 +121,12 @@ function flow(){
     let yy=y+84;(cap||[]).forEach(line=>{s+=T(x+w/2,yy,esc(line),{s:11,f:"#5b6a80"});yy+=14;});
     return {r:x+w,cy:y+h/2,l:x};
   }
-  // 2. received recommendation
-  const g2=node(250,170,gy,gh,fmt(D.rec.u),`(${D.rec.p}%)`,["Users who","received","recommendation"],Gb,Gd);
-  // 3. interaction
-  const g3=node(470,170,gy,gh,fmt(D.recInteract.u),`(${D.recInteract.p}%)`,["Recommended-product","interaction (click /","variant selection)"],Gb,Gd);
-  // 4. rec ATC
-  const g4=node(690,150,gy,gh,fmt(D.recAtc.u),`(${D.recAtc.p}%)`,["Recommended users","with ATC","(within window)"],Gb,Gd);
+  // 2. received recommendation (distinct users)
+  const g2=node(250,170,gy,gh,fmt(D.rec.u),`(${D.rec.p}% of total)`,["Users who","received a","recommendation"],Gb,Gd);
+  // 3. rec users who visited a product page
+  const g3=node(470,170,gy,gh,fmt(D.recPdp.u),`(${D.recPdp.p}% of rec)`,["Recommended users","who visited a","Product Page"],Gb,Gd);
+  // 4. rec PDP visitors who ATC
+  const g4=node(690,150,gy,gh,fmt(D.recAtc.u),`(${D.recAtc.p}% of PDP)`,["PDP visitors who","Added to Cart"],Gb,Gd);
   // 5. split panel (two stacked mini-boxes) inside an outer frame
   const p5x=880,p5w=250,p5y=gy-6,p5h=gh+12;
   s+=box(p5x,p5y,p5w,p5h,"#fdf7ee","#f0dcbd",14);
@@ -144,18 +143,18 @@ function flow(){
   s+=T(p5x+150,dy+34,`(${D.diffProdAtc.p}%) Added Different`,{s:10,f:"#a9781f"});
 
   // green arrows
-  s+=arrow(g2.r,g2.cy,470,g3.cy,G,`${D.recInteract.p}%`);
+  s+=arrow(g2.r,g2.cy,470,g3.cy,G,`${D.recPdp.p}%`);
   s+=arrow(g3.r,g3.cy,690,g4.cy,G,`${D.recAtc.p}%`);
   s+=arrow(g4.r,g4.cy,p5x,(p5y+p5h/2),G);
   s+=T((g4.r+p5x)/2,g4.cy-14,`Base: ${fmt(D.recAtc.u)}`,{s:9.5,f:"#3a7a55",w:700});
 
   // ================= BLUE LANE (bottom) =================
   const by=330, bh=140;
-  const b2=node(250,170,by,bh,fmt(D.nonrec.u),`(${D.nonrec.p}%)`,["Users who did NOT","receive","recommendation"],Bb,Bd,"#245b9c");
-  const b3=node(470,170,by,bh,fmt(D.nonrecPdp.u),`(${D.nonrecPdp.p}%)`,["Non-recommended users","visiting any","Product Page"],Bb,Bd,"#245b9c");
-  const b4=node(690,150,by,bh,fmt(D.nonrecAtc.u),`(${D.nonrecAtc.p}%)`,["Non-recommended users","with ATC","(within period)"],Bb,Bd,"#245b9c");
+  const b2=node(250,170,by,bh,fmt(D.nonrec.u),`(${D.nonrec.p}% of total)`,["Users who did NOT","receive a","recommendation"],Bb,Bd,"#245b9c");
+  const b3=node(470,170,by,bh,fmt(D.nonrecPdp.u),`(${D.nonrecPdp.p}% of non-rec)`,["Non-recommended users","who visited a","Product Page"],Bb,Bd,"#245b9c");
+  const b4=node(690,150,by,bh,fmt(D.nonrecAtc.u),`(${D.nonrecAtc.p}% of PDP)`,["PDP visitors who","Added to Cart"],Bb,Bd,"#245b9c");
   // blue summary
-  const bs=node(880,250,by,bh,fmt(D.nonrecAtc.u),`(${D.nonrecAtc.p}% of Non-rec Users)`,["Non-recommended users","with ATC (within period)"],"#eef4fc","#c4dbf7","#245b9c");
+  const bs=node(880,250,by,bh,fmt(D.nonrecAtc.u),`(${D.nonrecAtc.p}% of PDP visitors)`,["Non-recommended","buyers (within period)"],"#eef4fc","#c4dbf7","#245b9c");
 
   // anchor splits into two lanes
   s+=arrow(ax+aw,ay+ah*0.30,250,g2.cy,G);
@@ -173,19 +172,20 @@ function takeaways(){
   const lift=(D.recAtc.p/D.nonrecAtc.p).toFixed(1);
   const items=[
     {ic:"&#128101;",bg:"#e9f1fd",fg:"#1769e0",t:`Only <b>${D.rec.p}%</b> of users received a recommendation (<b>${fmt(D.rec.u)}</b> of ${fmt(D.total.u)}).`},
-    {ic:"&#128073;",bg:"#e8f6ee",fg:"#16a36a",t:`<b>${D.recInteract.p}%</b> of recommended users interacted with the recommended product (<b>${fmt(D.recInteract.u)}</b>).`},
-    {ic:"&#128722;",bg:"#e8f6ee",fg:"#16a36a",t:`Recommended users convert at <b>${D.recAtc.p}%</b> vs <b>${D.nonrecAtc.p}%</b> for non-recommended — a <b>${lift}×</b> lift.`},
-    {ic:"&#9733;",bg:"#fdf7ee",fg:"#f5a623",t:`Among recommended ATC users: <b>${D.recProdAtc.p}%</b> bought the recommended product, <b>${D.diffProdAtc.p}%</b> a different one.`}
+    {ic:"&#128065;",bg:"#e8f6ee",fg:"#16a36a",t:`<b>${D.recPdp.p}%</b> of recommended users went on to visit a Product Page (<b>${fmt(D.recPdp.u)}</b> of ${fmt(D.rec.u)}).`},
+    {ic:"&#128722;",bg:"#e8f6ee",fg:"#16a36a",t:`PDP visitors convert at <b>${D.recAtc.p}%</b> (recommended) vs <b>${D.nonrecAtc.p}%</b> (non-recommended) — a <b>${lift}×</b> lift.`},
+    {ic:"&#9733;",bg:"#fdf7ee",fg:"#f5a623",t:`Among recommended buyers: <b>${D.recProdAtc.p}%</b> bought the recommended product, <b>${D.diffProdAtc.p}%</b> a different one.`}
   ];
   document.getElementById("takeaways").innerHTML=items.map(x=>`<div class="tk"><div class="ic" style="background:${x.bg};color:${x.fg}">${x.ic}</div><div class="t">${x.t}</div></div>`).join("");
 }
 
 function footnote(){
   document.getElementById("footnote").innerHTML=
-   `<b>How to read:</b> The green lane follows users who received a recommendation; the blue lane follows those who did not. `+
-   `Percentages: exposure &amp; non-recommendation are of <b>total users (${fmt(D.total.u)})</b>; green-lane steps are of <b>recommended journeys (${fmt(D.rec.u)})</b>; `+
-   `the ${D.recProdAtc.p}% / ${D.diffProdAtc.p}% split is of <b>recommended ATC users (${fmt(D.recAtc.u)})</b>; blue-lane steps are of <b>non-recommended users (${fmt(D.nonrec.u)})</b>. `+
-   `Recommended lane is counted at journey grain, so lanes need not sum to total.`;
+   `<b>How to read:</b> A distinct-user funnel. Everyone starts as a Total User and splits into recommended (green) vs not-recommended (blue). `+
+   `Each lane then funnels <b>Product Page visit → Add to Cart</b>. `+
+   `Percentages: exposure &amp; non-recommendation are of <b>total users (${fmt(D.total.u)})</b>; PDP steps are of each lane's cohort (<b>${fmt(D.rec.u)}</b> rec / <b>${fmt(D.nonrec.u)}</b> non-rec); `+
+   `ATC steps are of that lane's <b>PDP visitors</b> (${fmt(D.recPdp.u)} rec / ${fmt(D.nonrecPdp.u)} non-rec); the ${D.recProdAtc.p}% / ${D.diffProdAtc.p}% split is of <b>recommended buyers (${fmt(D.recAtc.u)})</b>. `+
+   `All counts are distinct users, so the two lanes sum to the total.`;
 }
 
 flow();takeaways();footnote();
